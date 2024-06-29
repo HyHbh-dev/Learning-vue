@@ -75,47 +75,49 @@
   </div>
   <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
   <script>
+    // 设置默认购物车
+    const defaultArr = [
+      {
+        id: 1,
+        icon: './img/火龙果.png',
+        isChecked: true,
+        num: 2,
+        price: 6,
+      },
+      {
+        id: 2,
+        icon: './img/荔枝.png',
+        isChecked: false,
+        num: 7,
+        price: 20,
+      },
+      {
+        id: 3,
+        icon: './img/榴莲.png',
+        isChecked: false,
+        num: 3,
+        price: 40,
+      },
+      {
+        id: 4,
+        icon: './img/鸭梨.png',
+        isChecked: true,
+        num: 10,
+        price: 3,
+      },
+      {
+        id: 5,
+        icon: './img/樱桃.png',
+        isChecked: false,
+        num: 20,
+        price: 34,
+      },
+    ]
     const app = new Vue({
       el: '#app',
       data: {
-        // 水果列表
-        fruitList: [
-          {
-            id: 1,
-            icon: './img/火龙果.png',
-            isChecked: true,
-            num: 2,
-            price: 6,
-          },
-          {
-            id: 2,
-            icon: './img/荔枝.png',
-            isChecked: false,
-            num: 7,
-            price: 20,
-          },
-          {
-            id: 3,
-            icon: './img/榴莲.png',
-            isChecked: false,
-            num: 3,
-            price: 40,
-          },
-          {
-            id: 4,
-            icon: './img/鸭梨.png',
-            isChecked: true,
-            num: 10,
-            price: 3,
-          },
-          {
-            id: 5,
-            icon: './img/樱桃.png',
-            isChecked: false,
-            num: 20,
-            price: 34,
-          },
-        ],
+        // 水果列表 从本地获取或者清空了缓存为默认值
+        fruitList: JSON.parse(localStorage.getItem('list')) || defaultArr,
       },
       methods: {
         del(id) {
@@ -124,11 +126,10 @@
         }
       },
       computed: {
+        // 总价
         total() {
-          const num = this.fruitList.reduce(function (prev, current) {
-            return prev + current.num * current.price
-          }, 0)
-          return num
+          const num = this.fruitList.filter(item => item.isChecked)
+          return num.reduce((prev, current) => prev + current.num * current.price, 0)
         },
         // 判断全选内容
         selectAll: {
@@ -139,11 +140,24 @@
             this.fruitList.map(item => item.isChecked = value)
           }
         },
+        // 数量
         totalQuantity() {
           const num = this.fruitList.filter(item => item.isChecked)
           return num.reduce((prev, current) => prev + current.num, 0)
         }
       }
+      ,
+      watch: {
+        // 监听数据变化存入本地
+        fruitList: {
+          deep: true,
+          handler(newValues) {
+            // 复杂类型数据转json
+            localStorage.setItem('list', JSON.stringify(newValues))
+          }
+        }
+      }
+
     })
   </script>
 </body>
